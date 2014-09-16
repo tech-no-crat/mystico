@@ -1,0 +1,5 @@
+{
+  "fbAppId": "1552398928324404",
+  "fbAppSecret": "<App secret here>",
+  "fbRedirect": "http://localhost:1337/connect/callback"
+}
