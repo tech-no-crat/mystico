@@ -42,9 +42,13 @@ sync ->
       @postsCount = 0
       super args...
 
-    posts: ->
-      console.log "Looking for posts to user #{@id}"
-      (Post.find profile_ref: @id, parent_ref: 0).all()
+    posts: (since = 0) ->
+      console.log "Looking for posts to user #{@id} since #{since}"
+      (Post.find profile_ref: @id, parent_ref: 0, created_at: {'$gt': parseInt(since)}).sort(created_at: -1).all()
+
+    clientObject: ->
+      id: @id
+      name: @name
 
   class global.Post extends Model
     @collection 'posts'
@@ -57,6 +61,9 @@ sync ->
       console.log "Looking for replies to post #{@_id}"
       (Post.find parent_ref: @_id).all()
 
+    poster: ->
+      User.first id: @user_ref
+
 app.get '/', (req, res) ->
   if req.session.user
     res.render 'dashboard', {user: req.session.user}
@@ -65,7 +72,7 @@ app.get '/', (req, res) ->
 
 app.get '/connect', (req, res) ->
   console.log "Redirecting to facebook for authorization code"
-  res.redirect "https://www.facebook.com/dialog/oauth?client_id=#{config.fbAppId}&redirect_uri=#{config.fbRedirect}"
+  res.redirect "https://www.facebook.com/dialog/oauth?client_id=#{config.fbAppId}&redirect_uri=#{config.fbRedirect}&scope=user_friends,email"
 
 app.get '/connect/callback', (req, res) ->
   code = req.query.code
@@ -82,8 +89,10 @@ app.get '/connect/callback', (req, res) ->
       res.send('HTTP 500 - Error parsing facebook token')
       return
     console.log "Got token #{token}, getting user info"
-    request "https://graph.facebook.com/me?access_token=#{token}", (err, resp, body) ->
+    request "https://graph.facebook.com/me?access_token=#{token}&fields=id,name,friends,email", (err, resp, body) ->
       info = JSON.parse(body)
+      friends = info.friends.data
+      console.log info
 
       # Find or create user
       sync ->
@@ -93,7 +102,17 @@ app.get '/connect/callback', (req, res) ->
           user = new User
             id: info.id
             name: info.name
+            friends: info.friends.data.map( (x) -> x.id )
           user.save()
+
+          # Add user.id to friends' friendlists and (maybe?) send them a notification that their friend has joined
+          for friend_id in user.friends
+            friend = User.first(id: friend_id)
+            unless user.id in friend.friends
+              friend.friends.push(user.id)
+              #TODO: Add a notification here
+              friend.save()
+              
           console.log "User #{info.id} created"
         else
           console.log "User #{info.id} already existed"
@@ -132,39 +151,69 @@ app.post '/u/:id', (req, res) ->
 
   profile_id = req.params.id
   sync ->
+    # All posts posted are anonymous for now, except for those posted on one's own wall
     post = new Post
       body: req.body.body
       parent_ref: req.body.parent || 0
       profile_ref: profile_id
       user_ref: user.id
       created_at: Date.now()
-      anonymous: true
+      anonymous: (user.id != profile_id)
 
     unless User.exists(id: profile_id)
       res.status 404
       res.send "User profile not found"
     else
       post.save()
+      io.to(post.profile_ref).emit('post', anonymizePost(post, null))
       console.log "Wall post from user #{user.id} to #{post.profile_ref}, parent #{post.parent_ref} saved"
+      res.send anonymizePost(post, user)
 
-anonymizePosts = (posts) ->
+anonymizePost = (post, user) ->
+  anonymizePosts([post], user)[0]
+
+#TODO: Test this method to ensure the anonymity of users is fully preserved
+anonymizePosts = (posts, user) ->
   res = []
+  if user
+    user_id = user.id
+  else
+    user_id = null
   for post in posts
-    res.push
+    p =
       id: post._id
+      parent: post.parent_ref
       body: post.body
-      createdAt: parseInt(post.created_at)/1000
-      replies: post.replies()
+      createdAt: post.created_at
+      replies: anonymizePosts(post.replies(), user)
+      anonymous: post.anonymous
+      own: (user_id == post.user_ref)
+      can_administer: (user_id == post.profile_ref)
+    # Only include poster if it's the profile owner, the currently logged in user or if the post is not anonymous
+    if post.user_ref == post.profile_ref or (user_id == post.user_ref) !post.anonymous
+      p.poster = post.poster().clientObject()
+
+    res.push p
   return res
 
 app.get '/u/:id/wall', (req, res) ->
   id = req.params.id
+  since = req.query.since || 0
+  console.log "since: #{since}"
+
   sync ->
     u = User.first id: id
     if u
-      res.send JSON.stringify(anonymizePosts(u.posts()))
+      res.send anonymizePosts(u.posts(since), req.session.user)
     else
       res.status 404
       res.send "HTTP 404 - User not found"
 
 server = app.listen 1337
+
+io = require('socket.io')(server)
+
+io.sockets.on 'connection', (socket) ->
+  socket.on 'join room', (room) ->
+    socket.join room
+    console.log "Client joined room #{room}"

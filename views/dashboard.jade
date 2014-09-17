@@ -1,4 +1,9 @@
 include ./head
 include ./navbar
 p Dashboard
+h2 Your friends on mysti.co:
+
+ul
+  each friend in user.friends
+    li= friend
 include ./tail

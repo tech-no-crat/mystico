@@ -24,6 +24,12 @@ img.icon {
   height: 20px;
 }
 
+button.submit-button {
+  background-color: #EBCF00;
+  font-size: 12px;
+  padding: 0px 5px;
+}
+
 header#normal {
   background: #333;
   height: 70px;
@@ -164,13 +170,12 @@ footer {
       }
       button {
         float: right;
-        background-color: #EBCF00;
         margin: 3px;
         height: 24px;
-        font-size: 12px;
-        padding: 0px 5px;
         line-height: 20px;
       }
+
+      
     }
   }
 
@@ -188,6 +193,7 @@ footer {
   ul {
     list-style-type: none;
     margin: 0;
+    padding: 0;
   }
 
   #posts {
@@ -196,7 +202,7 @@ footer {
     padding: 0;
 
     li.post {
-      .body {
+      .post-body {
         background-color: white;
         padding: 20px 10px
       }
@@ -224,6 +230,7 @@ footer {
       }
       
       .expanded {
+        padding-top: 20px;
         background-color: #EDEDE9;
       }
 
@@ -232,23 +239,40 @@ footer {
         margin-left: 200px;
 
         .create-reply {
+          padding-bottom: 20px;
           textarea {
-            width: 400px;
-            height: 40px;
+            width: 500px;
+            height: 20px;
+            font-size: 15px;
             border: none;
           }
 
           button {
-            width: 100px;
-            margin: 0 30px;
+            width: 80px;
+            height: 25px;
+            margin: 0 5px;
           }
         }
 
         li {
-          background: white;
-          padding: 10px;
-          margin-bottom: 20px;
-          width: 100%;
+          margin-bottom: 25px;
+          width: 600px;
+
+          .reply-poster {
+            margin-right: 10px;
+            color: #737373;
+          }
+          
+          .reply-info {
+            color: #737373;
+            font-size: 12px;
+            height: 20px;
+            span, a {
+              padding-right: 10px;
+              line-height: 20px;
+              float: right;
+            }
+          }
         }
       }
 

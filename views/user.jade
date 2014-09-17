@@ -5,30 +5,35 @@ h2= profile.name
 #wall
   #create-post.wall-block
     input(type='hidden' value=profile.id)#profile-id
-    textarea#post-body(placeholder='Ξεκίνησε μια δημόσια συζήτηση σε αυτόν τον τοίχο!')
+    textarea#create-post-body(placeholder='Ξεκίνησε μια δημόσια συζήτηση σε αυτόν τον τοίχο!')
     .cont
       p 
         img(src='/img/anonymous.png').icon
         Η ταυτότητα σου θα παραμείνει μυστική
-      button.pure-button.pure-button-primary#submit-post Αποστολή
+      button.submit-button.pure-button.pure-button-primary#submit-post Αποστολή
   .loading(rv-hide = "profile.loaded") Περιμένετε όσο φορτώνουμε τις συζητήσεις σε αυτόν τον τοίχο
   .cont(rv-show = "profile.loaded")
     .empty-wall(rv-hide = "profile.posts | length") Ακόμη δεν υπάρχουν δημόσιες συζητήσεις σε αυτόν τον τοίχο. Δημιούργησε τη πρώτη!
     ul#posts
       li(rv-each-post="profile.posts").post.wall-block
-        .body { post.body }
+        .post-body { post.body }
         .info
-          span(rv-data-livestamp='post.createdAt')
-          span(rv-show='post.replies | length') { post.replies | length} απαντήσεις
+          a.poster(rv-href = 'post.poster | profileLink' rv-if = 'post.poster | exists') {post.poster.name}
+          span(rv-data-livestamp='post.createdAt | unixTime')
           a(rv-on-click = 'post.expand').expand
-            span(rv-hide='post.expanded') Περισσότερα
+            span(rv-hide = 'post.expanded' rv-if='post.replies | length') { post.replies | length} απαντήσεις
+            span(rv-hide = 'post.expanded' rv-if='post.replies | hasNone') Απάντησε
             span(rv-show='post.expanded') Απόκρυψη
         .expanded(rv-show = 'post.expanded')
             .replies
               ul
-                li(rv-each-reply="post.replies") { reply.body } 
+                li(rv-each-reply="post.replies").reply
+                  span.reply-poster(rv-if = 'reply.poster | exists') {reply.poster.name}
+                  span.reply-body { reply.body } 
+                  .reply-info
+                    span(rv-data-livestamp='reply.createdAt | unixTime')
               .create-reply
-                textarea(placeholder='Γράψε μια απάντηση').reply-body
-                button(rv-on-click="post.submitReply").pure-button.submit-reply Απάντησε
+                textarea(onkeypress = 'submitOnEnter()', placeholder='Γράψε μια απάντηση').reply-body
+                button(rv-on-click="post.submitReply").submit-button.pure-button.pure-button-primary Αποστολή
 
 include ./tail
