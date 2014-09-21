@@ -2,7 +2,16 @@ header#normal
   a(href='/')
     h1 Mysti.co
   ul#menu
-    li
-      a(href='/logout') Αποσύνδεση
-    li
-      a(href='/u/'+user.id)#user= user.name
+    if user
+      li
+        a(href='/logout') Αποσύνδεση
+      li
+        a(href='/u/'+user.id)#user= user.name
+      li#notifications(rv-on-click='user.toggleNotifications' rv-class-notify='user.unreadNotifications') {user.unreadNotifications}
+        ul(rv-show = 'user.showNotifications')
+          li.empty(rv-hide='user.notifications | length') Δεν υπάρχουν ειδοποιήσεις
+          li(rv-each-notification='user.notifications').notification
+            .notification-body Υπάρχει μια νέα απάντηση στη συζήτηση {notification.title}
+            .notification-info 
+              span(rv-data-livestamp='notification.createdAt | unixTime')
+    

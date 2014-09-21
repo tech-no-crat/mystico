@@ -1,9 +1,12 @@
 include ./head
 include ./navbar
+
+
 p Dashboard
 h2 Your friends on mysti.co:
 
 ul
   each friend in user.friends
-    li= friend
+    li
+      a(href='/u/' + friend.id)= friend.name
 include ./tail

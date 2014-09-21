@@ -18,6 +18,26 @@ textarea {
   }
 }
 
+.dropdown {
+  position: relative;
+  cursor: pointer;
+  span {
+    width: 100%;
+    height: 100%;
+  }
+
+  ul {
+    position: absolute;
+    top: 20px;
+    display: list-item;
+    border: solid 1px #333;
+    border-top: none;
+    box-shadow: 1px 1px 2px #333;
+    li {
+      position: relative;
+    }
+  }
+}
 
 img.icon {
   width: 20px;
@@ -66,6 +86,49 @@ header#normal {
       }
       a:hover {
         text-decoration: none;
+      }
+    }
+
+    #notifications {
+      cursor: pointer;
+      &.notify {
+        color: red;
+      }
+
+      ul {
+        position: absolute;
+        width: 400px;
+        top: 55px;
+        right: 0px;
+        padding: 0;
+        background: #333;
+        color: white;
+        font-size: 14px;
+        line-height: 15px;
+        font-family: sans-serif;
+        box-shadow: 2px 2px 3px #333;
+
+        li {
+          &.empty {
+            color: lighten(#333, 50%);
+            text-align: center;
+          }
+          width: 400px;
+          height: auto;
+          padding: 10px 0px;
+          border-bottom: solid 1px lighten(#333, 30%);
+
+          .notification-body {
+            padding: 5px 5px;
+          }
+          
+          .notification-info {
+            font-size: 12px;
+            color: lighten(#333, 50%);
+            text-align: right;
+            padding-right: 5px;
+          }
+        }
       }
     }
   }
@@ -202,6 +265,55 @@ footer {
     padding: 0;
 
     li.post {
+      .post-administration {
+        height: 20px;
+        background-color: #EDEDE9;
+        color: #737373;
+        font-size: 12px;
+        line-height: 20px;
+
+        .icon {
+          width: 16px;
+          height: 16px;
+          vertical-align: sub;
+          margin: 0 5px;
+        }
+        
+
+        .post-visibility {
+          display: inline-block;
+          width: 200px;
+          margin: 0 10px;
+          width: 200px;
+          margin: 0;
+
+          span:hover {
+            display: inline-block;
+            background: lighten(#EDEDE9, 30%);
+          }
+          
+          ul {
+            li {
+              width: 190px;
+              background: #EDEDE9;
+              padding: 5px 0;
+              padding-left: 10px;
+              &:hover {
+                background: lighten(#EDEDE9, 30%);
+              }
+            }
+          }
+        }
+
+        .delete-post {
+          display: inline-block;
+          padding-right: 10px;
+          float: right;
+          &:hover { text-decoration: none; }
+          cursor: pointer;
+        }
+      }
+
       .post-body {
         background-color: white;
         padding: 20px 10px
@@ -220,13 +332,18 @@ footer {
         }
       }
 
-      .expand {
-        display: inline-block;
-        float: right;
-        cursor: pointer;
+      .expand-post {
         &:hover {
           text-decoration: none;
         }
+        cursor: pointer;
+      }
+
+      .expand-post {
+        display: inline-block;
+        float: right;
+        cursor: pointer;
+        
       }
       
       .expanded {
@@ -287,4 +404,55 @@ footer {
     overflow: hidden;
     border-radius: 3px;
   }
+}
+
+#dialog {
+  display: none;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 100px;
+  margin-left: -250px;
+  margin-top: -50px;
+
+  background: white;
+  border: solid 1px gray;
+  border-radius: 5px;
+  box-shadow: 5px 5px 8px #333;
+
+  #dialog-body {
+    text-align: center;
+    font-size: 16px;
+    height: 60px;
+    line-height: 70px;
+  }
+
+  #dialog-controls {
+    button {
+      float: right;
+      margin: 3px 10px;
+      min-width: 100px;
+      font-size: 12px;
+    }
+
+  }
+  
+  button#decline {
+    background: rgb(66, 184, 221);
+  }
+  button#accept {
+    background: rgb(28, 184, 65);
+  }
+
+  &.dangerous {
+    button#accept {
+      background: rgb(202, 60, 60);
+    }
+  }
+}
+
+form#user-info {
+  display: none;
 }
