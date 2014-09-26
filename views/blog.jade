@@ -1,0 +1,11 @@
+include ./head.jade
+include ./navbar.jade
+
+h2 Development Miniblog
+each post in posts
+  article.blogpost
+    h3= post.title
+    .blogpost-body= post.body
+    .blogpost-info
+          span.poster= post.poster.name
+          span(data-livestamp=(post.created_at)/1000)

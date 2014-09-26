@@ -1,12 +1,38 @@
 include ./head
 include ./navbar
 
+#dashboard.pure-g
+  #feed.pure-u-4-5
+    h2 Πρόσφατα ενεργές συζητήσεις σε τοίχους φίλων:
 
-p Dashboard
-h2 Your friends on mysti.co:
+    ul#feed.posts
+      each post in feed
+        li
+          .post-description Κάποιος έγραψε στον τοίχο του χρήστη 
+            a.user(href= ("/u/" + post.profile.username))= post.profile.name
+          .post.wall-block
+            .post-body= post.body
+            .post-info
+                img(src='/img/anonymous.png').icon
+                span Ανώνυμος
+                span(data-livestamp= parseInt(post.createdAt)/1000)
+            .expanded
+              ul.post-replies
+                each reply in post.replies
+                  li.reply
+                    .reply-poster= reply.poster ? reply.poster.name : "Ανώνυμος"
+                    .reply-body= reply.body
+                    .reply-info
+                      span(data-livestamp= parseInt(reply.createdAt)/1000)
 
-ul
-  each friend in user.friends
-    li
-      a(href='/u/' + friend.id)= friend.name
+  #friends.pure-u-1-5
+    h2 Οι φίλοι σου στο Mysti.co:
+
+    ul
+      each friend in user.friends
+        li.friend
+          a(href='/u/' + friend.username)
+            img(src = 'https://graph.facebook.com/v2.1/' + friend.id + '/picture?type=square')
+            = friend.name
+
 include ./tail

@@ -3,5 +3,9 @@ header#landing
   h1 Mysti.co
   #desc Μίλα στους φίλους στο facebook, ανώνυμα
   button#connect Συνδέσου
+  if blogpost
+    #last-blogpost
+      Πρόσφατα στο blog:
+      a(href='/blog')= blogpost.title
 
 include ./tail.jade

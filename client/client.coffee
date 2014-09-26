@@ -56,11 +56,24 @@ class Post extends ClientModel
       posts = window.wall.posts
 
       # Delete locally
-      for i in [0...posts.length]
-        if(posts[i].id == post.id)
+      done = false
+      for i in [0..posts.length-1]
+        if(!done and posts[i].id == post.id)
           posts.splice i, 1
+          done = true
     
       $.post("/posts/#{post.id}/delete")
+    , ->
+
+  report: (event, scope) ->
+    post = scope.post
+    displayDialog 'Θέλεις σίγουρα να αναφέρεις αυτή τη συζήτη και τον δημιουργό της; Μην διστάσεις να αναφέρεις συζητήσεις με προσβλητικό χαρακτήρα.', 'Αναφορά', 'Όχι', 'dangerous', ->
+      console.log "Reporting post #{post.id}"
+
+      #TODO: Error Handling
+      $.post("/reports", {post: post.id})
+
+      displayDialog 'Η συνομηλία και ο δημιουργός της αναφέρθηκαν στην διαχείρηση του Mystico. Θέλεις επίσης να διαγράψεις τη συνομιλία;', 'Διαγραφή', 'Όχι', 'dangerous', (()-> post.delete(event, scope)) , ->
     , ->
 
 class Notification extends ClientModel
@@ -155,6 +168,8 @@ rivets.formatters.unixTime = (time) ->
 rivets.formatters.hasNone = (array) ->
   not (array and array.length > 0)
 
+rivets.formatters.link = (username) ->
+  "/u/" + username
 rivets.formatters.profileLink = (user) ->
   if user
     "/u/" + user.id
@@ -203,7 +218,7 @@ $(document).ready ->
       i = 0
       while i < scope.user.notifications.length
         notification = scope.user.notifications[i]
-        notification.markAsRead()
+        notification.markAsRead() unless notification.read
         i++
       scope.user.unreadNotifications = 0
 
@@ -232,7 +247,7 @@ $(document).ready ->
   $("#create-post-body").focus ->
     $("#create-post").addClass "open"
 
-  $("#submit-post").click ->
+  submitPost = ->
     body = $("#create-post-body").val()
     $("#create-post-body").val ""
     $("#create-post").removeClass "open"
@@ -240,6 +255,12 @@ $(document).ready ->
       body: body
       parent: null
 
+  $("#submit-post").click ->
+    if window.user.id
+      submitPost()
+    else
+      displayDialog 'Πρέπει πρώτα να συνδεθείς με το facebook, για να επιβεβαιώσουμε πως είσαι φίλος του χρήστη. Η ταυτότητα σου δεν θα αποκαλυφτεί ποτέ!', 'Εντάξει', 'Όχι', 'connect', submitPost
+      , ->
 
   window.submitOnEnter = ->
     e = window.event
@@ -254,7 +275,7 @@ $(document).ready ->
   # Socket.io stuff
 
   # TODO: Figure out the address to connect to somehow
-  window.socket = io.connect("http://178.62.129.206:1337")
+  window.socket = io.connect("/")
 
   socket.on "connect", ->
     data = profile: profile

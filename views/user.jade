@@ -1,21 +1,25 @@
 include ./head
 include ./navbar
-h2= profile.name
-
+h2
+  img(src = 'https://graph.facebook.com/v2.1/' + profile.id + '/picture?type=small')
+  = profile.name
 #wall
   input(type='hidden' value=profile.id)#profile-id
-  if user
-    #create-post.wall-block
-      textarea#create-post-body(placeholder='Ξεκίνησε μια δημόσια συζήτηση σε αυτόν τον τοίχο!')
-      .cont
-        p 
-          img(src='/img/anonymous.png').icon
-          Η ταυτότητα σου θα παραμείνει μυστική
-        button.submit-button.pure-button.pure-button-primary#submit-post Αποστολή
+  #create-post.wall-block
+    textarea#create-post-body(placeholder='Ξεκίνησε μια δημόσια συζήτηση σε αυτόν τον τοίχο!')
+    .cont
+      p 
+        img(src='/img/anonymous.png').icon
+        Η ταυτότητα σου θα παραμείνει μυστική
+      button.submit-button.pure-button.pure-button-primary#submit-post
+        if user
+          Αποστολή
+        else
+          Σύνδεση και αποστολή
   .loading(rv-hide = "profile.loaded") Περιμένετε όσο φορτώνουμε τις συζητήσεις σε αυτόν τον τοίχο
   .cont(rv-show = "profile.loaded")
     .empty-wall(rv-hide = "profile.posts | length") Ακόμη δεν υπάρχουν δημόσιες συζητήσεις σε αυτόν τον τοίχο. Δημιούργησε τη πρώτη!
-    ul#posts
+    ul#posts.posts
       li(rv-each-post="profile.posts").post.wall-block
         .post-administration(rv-if = 'post.can_administrate')
           .post-visibility(rv-on-click = 'post.toggleVisibilitySettings').dropdown
@@ -26,18 +30,26 @@ h2= profile.name
               li(rv-hide = "post.visibility | eq public" rv-on-click = 'post.setVisibilityPublic') <img class='icon' src='/img/public.png'/> Ορατό δημόσια
               li(rv-hide = "post.visibility | eq friends" rv-on-click = 'post.setVisibilityFriends') <img class='icon' src='/img/friends.png'/>Ορατό στους φίλους μου
               li(rv-hide = "post.visibility | eq private" rv-on-click = 'post.setVisibilityPrivate') <img class='icon' src='/img/private.png'/>Ιδωτική συνομιλία
+          a(rv-on-click = 'post.report').delete-post Αναφορά
           a(rv-on-click = 'post.delete').delete-post Διαγραφή
 
         .post-body { post.body }
-        .info
-          a.poster(rv-href = 'post.poster | profileLink' rv-show = 'post.poster | exists') {post.poster.name}
+        .post-info
+          span.poster( rv-show = 'post.poster | exists')
+            img(src='/img/anonymous.png').icon
+            Εσύ ως ανώνυμος
+          span.poster( rv-hide = 'post.poster | exists') <img src='/img/anonymous.png' class='icon'/> Ανώνυμος
+          span(rv-hide = 'post.can_administrate').visibility
+            span(rv-show = 'post.visibility | eq public') Ορατό δημόσια
+            span(rv-show = 'post.visibility | eq friends') Ορατό σε φίλους
+            span(rv-show = 'post.visibility | eq private') Ιδωτική συζήτηση
           span(rv-data-livestamp='post.createdAt | unixTime')
           a(rv-on-click = 'post.expand').expand-post
             span(rv-hide = 'post.expanded' rv-if='post.replies | length') { post.replies | length} απαντήσεις
-            span(rv-hide = 'post.expanded' rv-if='post.replies | hasNone') Απάντησε
+            span(rv-hide = 'post.expanded' rv-if='post.replies | hasNone') Προβολή συζήτησης
             span(rv-show='post.expanded') Απόκρυψη
         .expanded(rv-show = 'post.expanded')
-            .replies
+            .post-replies
               ul
                 li(rv-each-reply="post.replies").reply
                   span.reply-poster(rv-show = 'reply.poster | exists') {reply.poster.name}
@@ -46,7 +58,7 @@ h2= profile.name
                   .reply-info
                     span(rv-data-livestamp='reply.createdAt | unixTime')
               if user
-                .create-reply
+                .create-reply(rv-show='post.can_reply')
                   textarea(onkeypress = 'submitOnEnter()', placeholder='Γράψε μια απάντηση').reply-body
                   button(rv-on-click="post.submitReply").submit-button.pure-button.pure-button-primary Αποστολή
 

@@ -1,0 +1,71 @@
+include ./head.jade
+include ./navbar.jade
+h2 Admin Panel
+#admin.pure-g
+  #users.pure-u-3-5
+    #create-blog-post
+      h3 Create blog post
+      form(method='post', action='/blog')
+        input#title(type='text', name='title', placeholder='Title')
+        textarea(name='body', placeholder='Body')
+        input(type='submit')
+    h3 Users
+    table.pure-table
+      thead
+        tr
+          td Name
+          td Profile link
+          td Friends
+          td Posts in profile
+          td Posts created
+          td Replies created
+      each user in users
+        tr
+          td= user.name
+          td
+            a(href='/u/'+user.id) Profile
+          td= user.friends
+          td= user.profile_posts
+          td= user.posts_created
+          td= user.replies_created
+
+    h3 Reports
+    table.pure-table
+      thead
+        tr
+          td Reported by
+          td User reported
+          td Created
+          td Post ID
+      each report in reports
+        tr
+          td= report.user.name
+          td= report.reported_user.name
+          td= report.created_at
+          td= report.post
+
+  #stats.pure-u-2-5
+    h3 Numbers
+    table.pure-table
+      thead
+        tr
+          td Metric
+          td Last hour
+          td Last 24 hours
+          td Total
+      tr
+        td Signups
+        td= stats.signups.last_hour
+        td= stats.signups.last_24h
+        td= stats.signups.total
+      tr
+        td Posts
+        td= stats.posts.last_hour
+        td= stats.posts.last_24h
+        td= stats.posts.total
+      tr
+        td Replies
+        td= stats.replies.last_hour
+        td= stats.replies.last_24h
+        td= stats.replies.total
+    

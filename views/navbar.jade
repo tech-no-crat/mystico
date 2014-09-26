@@ -6,12 +6,16 @@ header#normal
       li
         a(href='/logout') Αποσύνδεση
       li
-        a(href='/u/'+user.id)#user= user.name
+        a(href='/u/'+user.username)#user= user.name
       li#notifications(rv-on-click='user.toggleNotifications' rv-class-notify='user.unreadNotifications') {user.unreadNotifications}
         ul(rv-show = 'user.showNotifications')
           li.empty(rv-hide='user.notifications | length') Δεν υπάρχουν ειδοποιήσεις
           li(rv-each-notification='user.notifications').notification
-            .notification-body Υπάρχει μια νέα απάντηση στη συζήτηση {notification.title}
-            .notification-info 
-              span(rv-data-livestamp='notification.createdAt | unixTime')
-    
+            a(rv-href='notification.profile | link')
+              .notification-body(rv-show='notification.type | eq reply') Υπάρχουν νέες απαντήσεις στη συζήτηση {notification.title}
+              .notification-body(rv-show='notification.type | eq post') Κάποιος άρχισε μια νέα συζήτηση στο τοίχο σας: {notification.title}
+              .notification-info 
+                span(rv-data-livestamp='notification.createdAt | unixTime')
+    else
+      li
+        a(href='/connect') Σύνδεση

@@ -11,11 +11,17 @@ h1 {
   text-shadow: 3px 2px 0px #333;
 }
 
-textarea {
-  resize: none;
-  &:focus {
-    outline: none;
+h2, h3 {
+  text-align: center;
+  font-family: 'Comfortaa';
+  img {
+    vertical-align: middle;
+    padding-right: 10px;
   }
+}
+
+ul {
+  list-style-type: none;
 }
 
 .dropdown {
@@ -42,6 +48,8 @@ textarea {
 img.icon {
   width: 20px;
   height: 20px;
+  vertical-align: middle;
+  padding-right: 5px;
 }
 
 button.submit-button {
@@ -120,6 +128,7 @@ header#normal {
 
           .notification-body {
             padding: 5px 5px;
+            color: white;
           }
           
           .notification-info {
@@ -183,6 +192,7 @@ a {
 }
 
 footer {
+  margin-top: 50px;
   text-align: center;
   font-size: 12px;
   a {
@@ -191,7 +201,6 @@ footer {
 }
 
 #wall {
-  font-family: sans-serif;
   width: 960px;
   margin: 0 auto;
   #create-post {
@@ -242,8 +251,9 @@ footer {
     }
   }
 
-  #posts, .empty-wall {
+  .posts, .empty-wall {
     clear: both;
+    margin: 0 auto;
   }
 
   .empty-wall, .loading {
@@ -253,167 +263,184 @@ footer {
     padding: 30px 0;
   }
 
+  
+}
+
+.wall-block {
+  display: block;
+  margin: 20px auto;
+  border: solid 1px #9C9C9C;
+  box-shadow: 1px 1px 1px #333;
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+.posts {
+  font-family: sans-serif;
+  width: 800px;
+  margin: 0 auto;
+  padding: 0;
   ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
   }
-
-  #posts {
-    width: 800px;
-    margin: 0 auto;
-    padding: 0;
-
-    li.post {
-      .post-administration {
-        height: 20px;
-        background-color: #EDEDE9;
-        color: #737373;
-        font-size: 12px;
-        line-height: 20px;
-
-        .icon {
-          width: 16px;
-          height: 16px;
-          vertical-align: sub;
-          margin: 0 5px;
-        }
-        
-
-        .post-visibility {
-          display: inline-block;
-          width: 200px;
-          margin: 0 10px;
-          width: 200px;
-          margin: 0;
-
-          span:hover {
-            display: inline-block;
-            background: lighten(#EDEDE9, 30%);
-          }
-          
-          ul {
-            li {
-              width: 190px;
-              background: #EDEDE9;
-              padding: 5px 0;
-              padding-left: 10px;
-              &:hover {
-                background: lighten(#EDEDE9, 30%);
-              }
-            }
-          }
-        }
-
-        .delete-post {
-          display: inline-block;
-          padding-right: 10px;
-          float: right;
-          &:hover { text-decoration: none; }
-          cursor: pointer;
-        }
-      }
-
-      .post-body {
-        background-color: white;
-        padding: 20px 10px
-      }
-
-      .info {
-        background-color: #EDEDE9;
-        height: 20px;
-        padding: 4px;
-        line-height: 20px;
-        font-size: 12px;
-        color: #D4BB00;
-
-        span {
-          padding: 0 10px;
-        }
-      }
-
-      .expand-post {
-        &:hover {
-          text-decoration: none;
-        }
-        cursor: pointer;
-      }
-
-      .expand-post {
-        display: inline-block;
-        float: right;
-        cursor: pointer;
-        
-      }
-      
-      .expanded {
-        padding-top: 20px;
-        background-color: #EDEDE9;
-      }
-
-      .replies {
-        width: 600px;
-        margin-left: 200px;
-
-        .create-reply {
-          padding-bottom: 20px;
-          textarea {
-            width: 500px;
-            height: 20px;
-            font-size: 15px;
-            border: none;
-          }
-
-          button {
-            width: 80px;
-            height: 25px;
-            margin: 0 5px;
-          }
-        }
-
-        li {
-          margin-bottom: 25px;
-          width: 600px;
-
-          .reply-poster {
-            margin-right: 10px;
-            color: #737373;
-          }
-          
-          .reply-info {
-            color: #737373;
-            font-size: 12px;
-            height: 20px;
-            span, a {
-              padding-right: 10px;
-              line-height: 20px;
-              float: right;
-            }
-          }
-        }
-      }
+  .post {
+    .post-description {
 
     }
-  }
+    .post-administration {
+      height: 20px;
+      background-color: #EDEDE9;
+      color: #737373;
+      font-size: 12px;
+      line-height: 20px;
 
-  .wall-block {
-    display: block;
-    margin: 20px auto;
-    border: solid 1px #9C9C9C;
-    box-shadow: 1px 1px 1px #333;
-    overflow: hidden;
-    border-radius: 3px;
+      .icon {
+        width: 16px;
+        height: 16px;
+        vertical-align: sub;
+        margin: 0 5px;
+      }
+      
+
+      .post-visibility {
+        display: inline-block;
+        width: 200px;
+        margin: 0 10px;
+        width: 200px;
+        margin: 0;
+
+        span:hover {
+          display: inline-block;
+          background: lighten(#EDEDE9, 30%);
+        }
+        
+        ul {
+          li {
+            width: 190px;
+            background: #EDEDE9;
+            padding: 5px 0;
+            padding-left: 10px;
+            &:hover {
+              background: lighten(#EDEDE9, 30%);
+            }
+          }
+        }
+      }
+
+      .delete-post {
+        display: inline-block;
+        padding-right: 10px;
+        float: right;
+        &:hover { text-decoration: none; }
+        cursor: pointer;
+      }
+    }
+
+    .post-body {
+      background-color: white;
+      padding: 20px 10px
+    }
+
+    .post-info {
+      background-color: #EDEDE9;
+      height: 20px;
+      padding: 4px;
+      line-height: 20px;
+      font-size: 12px;
+      color: #D4BB00;
+
+      span, a {
+        padding: 0 5px;
+        span {
+          padding: 0;
+        }
+      }
+    }
+
+    .expand-post {
+      &:hover {
+        text-decoration: none;
+      }
+      cursor: pointer;
+    }
+
+    .expand-post {
+      display: inline-block;
+      float: right;
+      cursor: pointer;
+      
+    }
+    
+    .expanded {
+      padding: 20px 0px;
+      background-color: #EDEDE9;
+    }
+
+    .post-replies {
+      width: 600px;
+      margin-left: 200px;
+
+      .create-reply {
+        margin-top: 25px;
+        textarea {
+          width: 500px;
+          height: 20px;
+          font-size: 15px;
+          border: none;
+          resize: none;
+        }
+
+        button {
+          width: 80px;
+          height: 25px;
+          margin: 0 5px;
+        }
+      }
+
+      li {
+        margin-bottom: 15px;
+        &:last-child {
+          margin-bottom: 0px;
+        }
+        width: 600px;
+
+        .reply-poster {
+          margin-right: 10px;
+          color: #737373;
+          display: inline-block;
+        }
+
+        .reply-body {
+          display: inline-block;
+        }
+        
+        .reply-info {
+          color: #737373;
+          font-size: 12px;
+          height: 20px;
+          span, a {
+            padding-right: 10px;
+            line-height: 20px;
+            float: right;
+          }
+        }
+      }
+    }
+
   }
 }
 
 #dialog {
   display: none;
+  font-family: sans-serif;
 
+  padding: 10px;
   position: fixed;
   top: 50%;
   left: 50%;
   width: 500px;
-  height: 100px;
   margin-left: -250px;
   margin-top: -50px;
 
@@ -425,8 +452,6 @@ footer {
   #dialog-body {
     text-align: center;
     font-size: 16px;
-    height: 60px;
-    line-height: 70px;
   }
 
   #dialog-controls {
@@ -456,3 +481,69 @@ footer {
 form#user-info {
   display: none;
 }
+
+#friends {
+  .friend {
+    &:hover {
+      background: darken(#EDEDE9, 5%);
+    }
+    padding: 5px 0;
+    img {
+      vertical-align: middle;
+      padding-right: 5px;
+    }
+  }
+}
+
+#stats, #users {
+  table {
+    font-family: sans-serif;
+    margin: 0 auto;
+  }
+}
+
+#create-blog-post {
+  form {
+    input, textarea {
+      display: block;
+      width: 600px;
+      margin: 10px auto;
+    }
+    textarea {
+      height: 100px;
+    }
+  }
+}
+
+.blogpost {
+  width: 800px;
+  margin: 20px auto;
+  padding: 10px;
+  border: 1px solid gray;
+  border-radius: 3px;
+  box-shadow: 2px 2px 2px #333;
+ 
+  background: lighten(#F2F2E7, 5%);
+  .blogpost-body, .blogpost-info {
+    font-family: sans-serif;
+  }
+
+  .blogpost-info {
+    text-align: right;
+    font-size: 11px;
+    color: darken(#EBCF00, 5%);
+    span {
+      margin: 0 5px;
+    }
+  }
+
+}
+
+#last-blogpost {
+  font-size: 14px;
+  a {
+    margin: 0 5px;
+  }
+}
+
+
