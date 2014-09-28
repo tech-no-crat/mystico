@@ -1,5 +1,6 @@
 {
   "fbAppId": "1552398928324404",
   "fbAppSecret": "<APP SECRET>",
-  "fbRedirect": "http://178.62.129.206:1337/connect/callback"
+  "fbRedirect": "https://mysti.co.in/connect/callback",
+  "adminIDs": ["<ADMIN 1 USER ID>", "<ADMIN 2 USER ID>"]
 }

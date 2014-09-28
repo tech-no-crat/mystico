@@ -12,6 +12,9 @@ bodyParser = require 'body-parser'
 https = require 'https'
 fs = require 'fs'
 
+ENV = process.argv[2] || "development"
+console.log "Environment is #{ENV}"
+
 # Configuration
 app.set 'view engine', 'jade'
 app.use sass.middleware({
@@ -23,12 +26,6 @@ app.use sass.middleware({
 app.use express.static('public')
 app.use session keys: ['test key']
 app.use bodyParser.urlencoded extended: true
-
-Driver.configure
-  databses:
-    dev:
-      name: 'dev'
-      host: 'localhost'
 
 # Call sync with a function of stuff you want to do synchronously. Intended for mongo-model operations.
 sync = (func) ->
@@ -48,7 +45,17 @@ maxLength = (string, limit) ->
 String.prototype.toUsername = -> @toLowerCase().replace(/[^a-zA-Z0-9]+/g, ".")
 
 sync ->
+  Driver.configure
+    databases:
+      development:
+        name: 'mystico_development'
+        host: 'localhost'
+      production:
+        name: 'mystico_production'
+        host: 'localhost'
+
   class global.User extends Model
+    @_db = ENV
     @collection 'users'
 
     constructor: (args...) ->
@@ -100,9 +107,10 @@ sync ->
       replies_created: Post.count user_ref: @id, parent_ref: {"$ne": 0}
     
     notifications: ->
-      (Notification.find user_ref: @id).sort(createdAt: -1).all()
+      (Notification.find read: false, user_ref: @id).sort(createdAt: -1).all()
 
   class global.Post extends Model
+    @_db = ENV
     @collection 'posts'
 
     constructor: (args...) ->
@@ -123,6 +131,7 @@ sync ->
       User.first id: @profile_ref
 
   class global.Notification extends Model
+    @_db = ENV
     @collection 'notifications'
 
     clientObj: ->
@@ -144,6 +153,7 @@ sync ->
       Post.first _id: @post_ref
 
   class global.Report extends Model
+    @_db =  ENV
     @collection 'reports'
 
     clientObj: ->
@@ -167,6 +177,7 @@ sync ->
       Post.first _id: @post_ref
 
   class global.BlogPost extends Model
+    @_db = ENV
     @collection 'blogposts'
 
     clientObj: ->
@@ -200,7 +211,7 @@ getStats = ->
 
 app.get '/admin', (req, res) ->
   user = req.session.user
-  if !user or user.id != config.adminID
+  if !user or !(user.id in config.adminIDs)
     res.status 401
     res.send "HTTP 401"
     return
@@ -219,7 +230,7 @@ app.get '/', (req, res) ->
     sync ->
       blogpost = BlogPost.find().sort(created_at: -1).limit(1).all()
       console.log blogpost
-      if blogpost
+      if blogpost.length > 0
         blogpost = blogpost[0].clientObj()
       else
         blogpost = null
@@ -227,6 +238,11 @@ app.get '/', (req, res) ->
 
 app.get '/terms', (req, res) ->
   res.send "Terms of Service"
+
+app.get '/about', (req, res) ->
+  user = req.session.user
+  res.render('about', {user: user})
+
 
 app.get '/connect', (req, res) ->
   console.log "Redirecting to facebook for authorization code"
@@ -267,7 +283,11 @@ app.get '/connect/callback', (req, res) ->
             friends: friends
             fbToken: token
             username: info.name.toUsername()
-          user.username = user.name.toUsername() + Math.floor(Math.random()*100) while User.count username: user.username
+
+          if !(user.username) or user.username.length < 5
+            user.username = user.id
+          else
+            user.username = user.name.toUsername() + Math.floor(Math.random()*100) while User.count username: user.username
 
           user.save()
 
@@ -305,6 +325,15 @@ app.get '/logout', (req, res) ->
   authTokens[req.session.token] = null
   res.redirect '/'
 
+getOgTags = (profile) ->
+  tags = {}
+  tags.title = "Mysti.co - #{profile.name}: Άρχισε μια συζήτηση στον τοίχο μου!"
+  tags.url = "https://mysti.co.in/u/#{profile.username}"
+  tags.image = "https://graph.facebook.com/v2.1/#{profile.id}/picture?type=large"
+
+  return tags
+
+
 # User profile page
 app.get '/u/:id', (req, res) ->
   id = req.params.id
@@ -318,7 +347,7 @@ app.get '/u/:id', (req, res) ->
         return
     if u
       console.log "User found: #{u.name}"
-      res.render('user', {user: req.session.user, profile: u, token: req.session.token})
+      res.render('user', {user: req.session.user, profile: u, token: req.session.token, ogTags: getOgTags(u)})
     else
       console.log "User not found (404)"
       res.status(404)
@@ -326,7 +355,7 @@ app.get '/u/:id', (req, res) ->
 
 app.post '/blog', (req, res) ->
   user = req.session.user
-  if !user or user.id != config.adminID
+  if !user or !(user.id in config.adminIDs)
     res.status 401
     res.send "HTTP 401"
     return
@@ -540,7 +569,6 @@ app.get '/u/:id/notifications', (req, res) ->
   sync ->
     user = User.first id: user.id
     notifications = user.notifications()
-    console.log notifications.map((x) -> x.clientObj())
     res.send notifications.map((x) -> x.clientObj())
 
 app.get '/u/:id/wall', (req, res) ->
@@ -586,19 +614,12 @@ app.get '/feed', (req, res) ->
     res.send anonymizePosts(posts, user)
 
 credentials = {
+  ca: fs.readFileSync('private/sub.class1.server.ca.pem').toString(),
   key: fs.readFileSync('private/mysti.co.in.key').toString(),
   cert: fs.readFileSync('private/ssl.crt').toString()
 }
 
 server = https.createServer(credentials, app)
-
-# Redirect from HTTP to HTTPS
-http_server = (http.createServer (req, res) ->
-  res.redirect 'https://mysti.co.in'
-).listen(80)
-
-server.listen 443
-console.log "Running on ports 80 and 443"
 
 authenticateSocket = (socket, user_id, token) ->
   if authTokens[token] != user_id
@@ -667,3 +688,21 @@ io.sockets.on 'connection', (socket) ->
         notification.save()
         console.log "Notification #{notification._id} read"
       #TODO: else emit error
+
+start = ->
+  # Redirect from HTTP to HTTPS
+  https_redirecter = express()
+  https_redirecter.get '/', (req, res) ->
+    res.redirect 'https://mysti.co.in'
+
+  if ENV == 'production'
+    http_server = (http.createServer(https_redirecter)).listen(80)
+    server.listen 443
+    console.log "Running on production: HTTPS redirect on port 80, app on 443"
+  else if ENV == 'development'
+    server.listen 1337
+    console.log "Running on development: app on 1337"
+  else
+    console.log "Unknown environment"
+
+start()

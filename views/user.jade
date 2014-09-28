@@ -1,5 +1,9 @@
 include ./head
 include ./navbar
+if user && user.id == profile.id
+  #share
+    a(href = 'https://facebook.com/sharer.php?app_id=1552398928324404&sdk=joey&u=' + encodeURIComponent("https://mysti.co.in/u/" + profile.username) + "&display=popup&ref=plugin", target = "_blank")
+      Μοιράσου τον τοίχο σου στο Facebook!
 h2
   img(src = 'https://graph.facebook.com/v2.1/' + profile.id + '/picture?type=small')
   = profile.name

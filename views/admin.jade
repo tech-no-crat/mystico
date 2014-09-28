@@ -41,7 +41,8 @@ h2 Admin Panel
         tr
           td= report.user.name
           td= report.reported_user.name
-          td= report.created_at
+          td
+            span(data-livestamp = (report.created_at)/1000)
           td= report.post
 
   #stats.pure-u-2-5

@@ -3,6 +3,12 @@ html
   head
     title Mystico
     link(rel='stylesheet', href='/style.css')
+
+    if ogTags
+      meta(property='og:title', content= ogTags.title || "Mysti.co.in: Μίλα με τους φίλους σου, ανώνυμα")
+      meta(property='og:url', content= ogTags.url || "https://mysti.co.in")
+      meta(property='og:image', content= ogTags.image || "https://mysti.co.in/logo.png")
+
     script(src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
     script(src='/socket.io/socket.io.js')
     script(src='/moment.js')

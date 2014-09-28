@@ -374,7 +374,6 @@ footer {
     }
     
     .expanded {
-      padding: 20px 0px;
       background-color: #EDEDE9;
     }
 
@@ -383,13 +382,18 @@ footer {
       margin-left: 200px;
 
       .create-reply {
-        margin-top: 25px;
+        margin: 25px 0;
         textarea {
           width: 500px;
           height: 20px;
           font-size: 15px;
           border: none;
           resize: none;
+
+          &:focus {
+            height: 40px;
+            outline: none;
+          }
         }
 
         button {
@@ -546,4 +550,28 @@ form#user-info {
   }
 }
 
+#about {
+  padding: 10px;
+  h3, p {
+    text-align: left;
+  }
 
+  h3 {
+    color: darken(#D6BD00, 5%);
+  }
+
+  p {
+    font-size: 14px;
+  }
+}
+
+#share {
+  width: 100%;
+  background: #364c7c;
+  text-align: center;
+  padding: 10px 0;
+
+  a {
+    color: white;
+  }
+}
